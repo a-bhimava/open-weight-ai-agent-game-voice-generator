@@ -1,0 +1,29 @@
+# Generated audio outputs (large binary files)
+*.wav
+*.mp3
+*.ogg
+*.flac
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+env/
+venv/
+.env
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# HuggingFace model cache
+.cache/
+
+# Colab output dirs
+qwen3_tts_outputs/
+audiobook_outputs/
