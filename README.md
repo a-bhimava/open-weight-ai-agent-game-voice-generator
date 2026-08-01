@@ -1,12 +1,12 @@
 # 🎙️ Text-to-Speech Experiments — Qwen3-TTS
 
-A collection of 10 self-contained Google Colab notebooks for experimenting with **Qwen3-TTS** — Alibaba's state-of-the-art open-weight text-to-speech model series.
+A collection of 20 self-contained Google Colab notebooks for experimenting with **Qwen3-TTS** — Alibaba's state-of-the-art open-weight text-to-speech model series.
 
 > Supports **Voice Cloning**, **Voice Design**, and **Custom Preset Voices** across 10 languages — fully free, no API key needed.
 
 ---
 
-## 📋 Notebooks
+## 📋 Notebooks — Series 1: General TTS MVPs
 
 | # | Notebook | Description | Model |
 |---|---|---|---|
@@ -20,6 +20,23 @@ A collection of 10 self-contained Google Colab notebooks for experimenting with 
 | 8 | [08_Game_NPC_Voice_MVP.ipynb](./08_Game_NPC_Voice_MVP.ipynb) | NPC voice foundry for games & tabletop RPGs | `1.7B-VoiceDesign` |
 | 9 | [09_Colab_Webhook_API_MVP.ipynb](./09_Colab_Webhook_API_MVP.ipynb) | Colab as a live REST API (FastAPI + Cloudflare Tunnel) | `0.6B-CustomVoice` |
 | 10 | [10_AllInOne_Gradio_App_MVP.ipynb](./10_AllInOne_Gradio_App_MVP.ipynb) | 5-tab Gradio web app with shareable public URL | Switchable |
+
+---
+
+## 🎮 Notebooks — Series 2: Game NPC Voice Deep Dive
+
+| # | Notebook | Description | Model |
+|---|---|---|---|
+| 11 | [11_RPG_Class_Voice_Pack_MVP.ipynb](./11_RPG_Class_Voice_Pack_MVP.ipynb) | 8 RPG classes × 3 event lines (greeting, combat, death) + party intro scene | `1.7B-VoiceDesign` |
+| 12 | [12_Horror_Dark_Entity_Pack_MVP.ipynb](./12_Horror_Dark_Entity_Pack_MVP.ipynb) | 6 horror archetypes (ghost, demon, cult leader, possessed, undead, eldritch) | `1.7B-VoiceDesign` |
+| 13 | [13_SciFi_Species_Pack_MVP.ipynb](./13_SciFi_Species_Pack_MVP.ipynb) | 6 sci-fi species (hivemind, rogue AI, cyborg, mutant, diplomat, machine god) | `1.7B-VoiceDesign` |
+| 14 | [14_Companion_Voice_Set_MVP.ipynb](./14_Companion_Voice_Set_MVP.ipynb) | Full 41-line companion event library via Design → Clone pipeline | `1.7B-VoiceDesign` + `1.7B-Base` |
+| 15 | [15_Boss_Battle_Monologue_MVP.ipynb](./15_Boss_Battle_Monologue_MVP.ipynb) | 4 bosses × 3-phase encounter (intro → taunts → death speech) + selection reel | `1.7B-VoiceDesign` |
+| 16 | [16_Branching_Dialogue_Tree_MVP.ipynb](./16_Branching_Dialogue_Tree_MVP.ipynb) | Dialogue tree with player-choice branches, tree-aware filenames & JSON manifest | `1.7B-VoiceDesign` |
+| 17 | [17_Dynamic_Emotion_Engine_MVP.ipynb](./17_Dynamic_Emotion_Engine_MVP.ipynb) | 8 emotions × 3 intensities = 24-clip reactive voice grid | `1.7B-VoiceDesign` |
+| 18 | [18_Voice_Aging_System_MVP.ipynb](./18_Voice_Aging_System_MVP.ipynb) | Same character at young / adult / elder ages — life story arcs | `1.7B-VoiceDesign` |
+| 19 | [19_Ambient_Crowd_Chatter_MVP.ipynb](./19_Ambient_Crowd_Chatter_MVP.ipynb) | 5 scene types → loopable ambient audio beds (market, tavern, battlefield, dungeon, space station) | `1.7B-CustomVoice` |
+| 20 | [20_Procedural_NPC_Generator_MVP.ipynb](./20_Procedural_NPC_Generator_MVP.ipynb) | Genre seed → deterministic unique NPC (name + backstory + voice + lines) | `1.7B-VoiceDesign` |
 
 Also includes the original reference notebook:
 - [Qwen3_TTS_Colab.ipynb](./Qwen3_TTS_Colab.ipynb) — Complete reference notebook with all Qwen3-TTS features
