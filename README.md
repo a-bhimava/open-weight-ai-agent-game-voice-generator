@@ -101,6 +101,32 @@ pip install qwen-tts soundfile gradio feedparser pypdf
 
 ---
 
+## 🔬 Qwen3-TTS Technical Details & Features
+
+### Technical Specifications
+
+| Parameter | Specification | Details & Highlights |
+|---|---|---|
+| **Architecture** | Language-Model-based TTS | Built on Qwen 3 language model backbone with dedicated audio tokenization |
+| **Audio Frame Rate** | `12 Hz` | Ultra-low bitrate audio representation for extended generation with minimal memory footprint |
+| **Output Sample Rate** | `24 kHz` | High-fidelity waveform synthesis |
+| **Model Sizes** | `1.7B` and `0.6B` | `1.7B` for premium production quality; `0.6B` for lightweight edge/speed-critical deployment |
+| **Context / Cloning Input** | `3–15 seconds` | Zero-shot voice cloning requires only a short clean reference clip |
+| **Supported Languages** | `10 Languages` | English, Chinese, Japanese, Korean, German, French, Spanish, Italian, Russian, Portuguese |
+| **Precision Support** | `bfloat16`, `float16`, `float32` | Fully optimized for modern NVIDIA GPUs (Ampere / Ada Lovelace / Hopper) and CPU inference |
+
+### Core Capabilities & Feature Matrix
+
+| Feature | Primary Model(s) | Key Capability | Typical Use Case |
+|---|---|---|---|
+| **Zero-Shot Voice Cloning** | `Base` (`1.7B` / `0.6B`) | Replicas voice identity, tone, and acoustic environment from a 3–15s reference WAV | Audiobooks, personal voice dubbing, NPC character matching |
+| **Voice Persona Design** | `VoiceDesign` (`1.7B`) | Synthesizes a completely unique voice from natural-language prompts (age, gender, accent, emotion) | Game NPC generation, synthetic character aging, creative audio design |
+| **Preset Speaker Synthesis** | `CustomVoice` (`1.7B` / `0.6B`) | Highly optimized multi-speaker synthesis with standard preset voices (Ryan, Vivian, etc.) | Podcasts, multi-speaker dramas, automated news briefings |
+| **Cross-Lingual Dubbing** | `CustomVoice` & `Base` | Preserves speaker timbre while seamlessly synthesizing speech across any of the 10 supported languages | Localization, international game dubbing, multilingual avatars |
+| **Dynamic Emotional Control** | `VoiceDesign` & `CustomVoice` | Direct control over emotional intensity (anger, sorrow, excitement, whisper, sarcasm) via prompt instructions | Dramatic storytelling, reactive game dialogue, cinematic cutscenes |
+
+---
+
 ## 🌐 Languages Supported
 
 English · Chinese · Japanese · Korean · French · German · Spanish · Italian · Russian · Portuguese
