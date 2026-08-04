@@ -1,8 +1,22 @@
 # 🎙️ Text-to-Speech Experiments — Qwen3-TTS
 
-A collection of 20 self-contained Google Colab notebooks for experimenting with **Qwen3-TTS** — Alibaba's state-of-the-art open-weight text-to-speech model series.
+A collection of 31 self-contained Google Colab notebooks for experimenting with **Qwen3-TTS** — Alibaba's state-of-the-art open-weight text-to-speech model series.
 
 > Supports **Voice Cloning**, **Voice Design**, and **Custom Preset Voices** across 10 languages — fully free, no API key needed.
+
+---
+
+## ⚡ Use Qwen3-TTS in 5 Lines
+
+Generate custom-designed voice audio in just **5 lines of Python**:
+
+```python
+import torch, soundfile as sf
+from qwen_tts import Qwen3TTSModel
+model = Qwen3TTSModel.from_pretrained("Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign", device_map="cuda:0", dtype=torch.bfloat16)
+wavs, sr = model.generate_voice_design("Hello, welcome to the future of voice AI!", language="English", instruct="warm, clear professional narrator")
+sf.write("output.wav", wavs[0], sr)
+```
 
 ---
 
@@ -37,6 +51,24 @@ A collection of 20 self-contained Google Colab notebooks for experimenting with 
 | 18 | [18_Voice_Aging_System_MVP.ipynb](./18_Voice_Aging_System_MVP.ipynb) | Same character at young / adult / elder ages — life story arcs | `1.7B-VoiceDesign` |
 | 19 | [19_Ambient_Crowd_Chatter_MVP.ipynb](./19_Ambient_Crowd_Chatter_MVP.ipynb) | 5 scene types → loopable ambient audio beds (market, tavern, battlefield, dungeon, space station) | `1.7B-CustomVoice` |
 | 20 | [20_Procedural_NPC_Generator_MVP.ipynb](./20_Procedural_NPC_Generator_MVP.ipynb) | Genre seed → deterministic unique NPC (name + backstory + voice + lines) | `1.7B-VoiceDesign` |
+
+---
+
+## 🎬 Notebooks — Series 3: Character Voice Aging & Iconic Archetypes
+
+| # | Notebook | Description | Model |
+|---|---|---|---|
+| 21 | [21_Character_Voice_Aging_MVP.ipynb](./21_Character_Voice_Aging_MVP.ipynb) | Complete aging system (8 archetypes × 4 life stages + life story montages) | `1.7B-VoiceDesign` |
+| 22 | [22_Aria_Voss_MVP.ipynb](./22_Aria_Voss_MVP.ipynb) | Aria Voss: The Broken Empress (liberator → conqueror → tyrant → exile) | `1.7B-VoiceDesign` |
+| 23 | [23_Zane_Holloway_MVP.ipynb](./23_Zane_Holloway_MVP.ipynb) | Zane Holloway: The Street Detective (rookie → ace → worn → legend) | `1.7B-VoiceDesign` |
+| 24 | [24_Rex_Dagger_MVP.ipynb](./24_Rex_Dagger_MVP.ipynb) | Rex Dagger: The Cosmic Mercenary (reckless → reluctant hero → scarred → legend) | `1.7B-VoiceDesign` |
+| 25 | [25_Nora_Vance_MVP.ipynb](./25_Nora_Vance_MVP.ipynb) | Nora Vance: The Vigilante Hacker (recluse → operative → ghost → vanished) | `1.7B-VoiceDesign` |
+| 26 | [26_Theo_Ashworth_MVP.ipynb](./26_Theo_Ashworth_MVP.ipynb) | Theo Ashworth: The Fallen King (crowned → ruler → fallen → wanderer) | `1.7B-VoiceDesign` |
+| 27 | [27_Cora_Langston_MVP.ipynb](./27_Cora_Langston_MVP.ipynb) | Cora Langston: The Time Traveler (explorer → veteran → weighted → serene) | `1.7B-VoiceDesign` |
+| 28 | [28_Lena_Stavros_MVP.ipynb](./28_Lena_Stavros_MVP.ipynb) | Lena Stavros: The Battle Medic (idealist → surgeon → worn → veteran) | `1.7B-VoiceDesign` |
+| 29 | [29_Dorian_Slate_MVP.ipynb](./29_Dorian_Slate_MVP.ipynb) | Dorian Slate: The Reluctant Prophet (ordinary → reluctant → carrier → transcendent) | `1.7B-VoiceDesign` |
+| 30 | [30_Mara_Stone_MVP.ipynb](./30_Mara_Stone_MVP.ipynb) | Mara Stone: The Immortal Assassin (weapon → questioning → reclaiming → human) | `1.7B-VoiceDesign` |
+| 31 | [31_Otto_Crane_MVP.ipynb](./31_Otto_Crane_MVP.ipynb) | Otto Crane: The Gruff Engineer (upstart → master → veteran → legend) | `1.7B-VoiceDesign` |
 
 Also includes the original reference notebook:
 - [Qwen3_TTS_Colab.ipynb](./Qwen3_TTS_Colab.ipynb) — Complete reference notebook with all Qwen3-TTS features
