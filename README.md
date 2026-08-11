@@ -139,3 +139,23 @@ English · Chinese · Japanese · Korean · French · German · Spanish · Itali
 - [HuggingFace Collection](https://huggingface.co/collections/Qwen/qwen3-tts)
 - [Live HF Demo](https://huggingface.co/spaces/Qwen/Qwen3-TTS-Demo)
 - [Technical Paper](https://arxiv.org/abs/2601.15621)
+
+---
+
+## ⚖️ Qwen3-TTS vs ElevenLabs
+
+| Aspect | Qwen3-TTS | ElevenLabs |
+|---|---|---|
+| **Licensing** | Open weights — run locally or in Colab | Closed, hosted API only |
+| **Cost** | Free (you pay only for GPU / compute) | Subscription + per-character credits |
+| **API Key** | Not required | Required |
+| **Voice Cloning** | Zero-shot from a 3–15s clip | Instant + professional (fine-tuned) cloning |
+| **Voice Design** | Text-prompt persona design (`VoiceDesign`) | Text-to-Voice prompt design + large voice library |
+| **Languages** | 10 | 30+ |
+| **Quality** | Very strong, near-commercial | Generally the quality benchmark |
+| **Latency** | Depends on your GPU (~real-time on T4) | Low-latency streaming (Flash models) |
+| **Privacy** | Fully offline — audio never leaves your machine | Audio processed on ElevenLabs servers |
+| **Customization** | Full — weights, precision, fine-tuning, batching | Limited to exposed API parameters |
+| **Best for** | Research, bulk generation, games, cost-sensitive & private workloads | Production apps needing max polish, wide language coverage, zero ops |
+
+> **TL;DR** — ElevenLabs wins on polish, language breadth, and zero-setup convenience. Qwen3-TTS wins on cost, privacy, and control, and is close enough in quality for most creative and production use cases.
