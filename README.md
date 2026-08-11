@@ -20,6 +20,27 @@ sf.write("output.wav", wavs[0], sr)
 
 ---
 
+## 📂 Repository Structure — Where to Find What
+
+```
+qwen-tts/
+├── 01_general_tts/           # Notebooks 01–10 — core TTS applications
+├── 02_game_npc_voices/       # Notebooks 11–20 — game & NPC voice packs
+├── 03_character_archetypes/  # Notebooks 21–31 — character aging & personas
+└── reference/                # Full Qwen3-TTS feature reference notebook
+```
+
+| Folder | Notebooks | What's Inside | Start Here If You Want To… |
+|---|---|---|---|
+| **[`01_general_tts/`](./01_general_tts/)** | 01–10 | Audiobooks, multi-speaker drama, voice cloning, voice design, multilingual dubbing, RSS/PDF readers, a REST API, and an all-in-one Gradio app | Learn the basics, clone a voice, or ship a general-purpose TTS tool |
+| **[`02_game_npc_voices/`](./02_game_npc_voices/)** | 11–20 | RPG class packs, horror & sci-fi archetypes, companion voice sets, boss monologues, branching dialogue trees, emotion grids, crowd ambience, procedural NPCs | Bulk-generate game dialogue, NPC voice packs, or reactive game audio |
+| **[`03_character_archetypes/`](./03_character_archetypes/)** | 21–31 | One deep-dive notebook per named character — each aging across 4 life stages with full story arcs, plus a general 8-archetype aging system | Build a recurring character whose voice evolves over their lifetime |
+| **[`reference/`](./reference/)** | — | The original end-to-end notebook covering every Qwen3-TTS feature | Look up an API, parameter, or feature without app-specific wrapping |
+
+> **New here?** Start with [`01_general_tts/01_Audiobook_Studio_MVP.ipynb`](./01_general_tts/01_Audiobook_Studio_MVP.ipynb) for the simplest end-to-end example, or [`01_general_tts/10_AllInOne_Gradio_App_MVP.ipynb`](./01_general_tts/10_AllInOne_Gradio_App_MVP.ipynb) to try every feature from a UI.
+
+---
+
 ## 📋 Notebooks — Series 1: General TTS MVPs
 
 | # | Notebook | Description | Model |
