@@ -1,12 +1,14 @@
-# 🎙️ Chronovox
+# 🎙️ Open-Weight AI Game Character Voice Generator
 
-**A voice production system for game audio — built on Qwen3-TTS.**
+**A voice production system for game audio — built on open-weight Qwen3-TTS, running entirely on your own GPU.**
 
-Chronovox generates complete character voice packs for games: NPC dialogue libraries, branching conversation trees with engine-ready manifests, boss encounter arcs, emotional response grids — and characters whose voices **age credibly across a lifetime**.
+This system generates complete character voice packs for games: NPC dialogue libraries, branching conversation trees with engine-ready manifests, boss encounter arcs, emotional response grids — and characters whose voices **age credibly across a lifetime**.
 
 Every module runs on a free Colab T4. No API key, no per-character billing, no rate limit.
 
 > **The headline capability:** the same character, rendered at 17, 32, 50, and 68 — recognizably one person, audibly a different age. Not pitch-shifted. Re-synthesized, with the persona held invariant and only the age-carried qualities of the voice allowed to move.
+
+**Scope at a glance:** 31 production modules · 5 model checkpoints · 4 generation modes · 3 delivery interfaces (notebook, Gradio, REST) · ~500 rendered clips · 0 API keys.
 
 ---
 
@@ -79,10 +81,132 @@ Reference implementation: [`14_Companion_Voice_Set_MVP.ipynb`](./02_game_npc_voi
 
 ---
 
+## 🔄 How It Works — End to End
+
+Content enters as text, becomes a natural-language persona prompt, is rendered by one of four open-weight checkpoints on a local GPU, is assembled into WAV artifacts, and leaves through one of three interfaces. **Solid = shipped today. Dashed = the agent layer, designed but not yet built** — see [Planned: Agent Orchestration Layer](#-planned-agent-orchestration-layer).
+
+```mermaid
+flowchart TB
+
+    subgraph SRC["① CONTENT SOURCES"]
+        direction LR
+        I1["Character rosters and dialogue<br/>Python dicts, in-notebook"]
+        I2["Live RSS<br/>feedparser"]
+        I3["Documents<br/>pypdf / md / txt"]
+        I4["Reference audio<br/>clone.wav · upload · Gradio"]
+    end
+
+    subgraph PROMPT["② PROMPT LAYER — the only control surface"]
+        direction LR
+        P1["persona_core<br/>invariant identity, never edited"]
+        P2["modifier<br/>life stage · emotion · intensity"]
+        P3["instruct =<br/>persona_core + ', ' + modifier"]
+        P1 --> P3
+        P2 --> P3
+    end
+
+    subgraph MODELS["③ MODEL LAYER — HuggingFace Hub to local GPU · bfloat16 + sdpa · no API key"]
+        direction LR
+        M1["1.7B-VoiceDesign"]
+        M2["1.7B-Base"]
+        M3["1.7B-CustomVoice"]
+        M4["0.6B-CustomVoice"]
+    end
+
+    subgraph CALLS["④ GENERATION CALLS — qwen_tts SDK"]
+        direction LR
+        C1["generate_voice_design<br/>text, language, instruct<br/><br/>backed by 1.7B-VoiceDesign"]
+        C4["generate_custom_voice<br/>text, language, speaker, instruct<br/><br/>backed by CustomVoice"]
+        C2["create_voice_clone_prompt<br/>ref_audio, ref_text<br/><br/>backed by 1.7B-Base"]
+        C3["generate_voice_clone<br/>text, language, voice_clone_prompt<br/><br/>backed by 1.7B-Base"]
+        REF["reference WAV<br/>timbre fixed by one design call"]
+        C1 ==>|"DESIGN once"| REF
+        REF ==> C2
+        C2 ==>|"compiled identity handle"| C3
+    end
+
+    subgraph POSTP["⑤ POST-PROCESSING"]
+        direction LR
+        O1["to_wav<br/>normalize tuple / tensor / list return"]
+        O2["np.concatenate + np.zeros silence pads<br/>gap 0.2s to 2.5s, chosen by intent"]
+        O1 --> O2
+    end
+
+    subgraph ART["⑥ ARTIFACTS"]
+        direction LR
+        A1["24 kHz mono WAV"]
+        A2["dialogue_manifest.json"]
+        A3["zip bundle"]
+    end
+
+    subgraph IFACE["⑦ DELIVERY INTERFACES"]
+        direction LR
+        F1["Colab notebook<br/>files.download · Drive mount"]
+        F2["Gradio app<br/>share=True to gradio.live"]
+        F3["FastAPI + Cloudflare Tunnel<br/>GET / · GET /api/speakers<br/>POST /api/tts/custom · POST /api/tts/design<br/>StreamingResponse audio/wav from io.BytesIO"]
+    end
+
+    subgraph AGENT["⑧ AGENT ORCHESTRATION LAYER — PLANNED, NOT YET BUILT"]
+        direction LR
+        G1["Production brief<br/>natural language"]
+        G2["Plan cast, persona_core,<br/>stage/emotion matrix, lines"]
+        G3["Select mode<br/>Design-to-Clone · VoiceDesign · CustomVoice"]
+        G4["Batched render<br/>list-valued text / language / instruct"]
+        G5["QA duration, silence, clipping<br/>regenerate outliers"]
+        G6["Emit standardized manifest"]
+        G1 -.-> G2 -.-> G3 -.-> G4 -.-> G5 -.-> G6
+    end
+
+    SRC -->|"persona description · reference clip"| PROMPT
+    SRC -->|"text to speak"| CALLS
+    PROMPT -->|"instruct string"| CALLS
+    MODELS -->|"loaded checkpoint"| CALLS
+    CALLS -->|"raw model output"| POSTP
+    POSTP --> ART
+    ART --> IFACE
+
+    AGENT -.->|"writes persona_core and modifiers"| PROMPT
+    AGENT -.->|"selects call and checkpoint"| CALLS
+    ART -.->|"QA feedback loop"| AGENT
+
+    classDef planned stroke-dasharray: 6 4;
+    class G1,G2,G3,G4,G5,G6 planned;
+```
+
+### The four generation calls
+
+| Call | Model | What it does | Used by |
+|---|---|---|---|
+| `generate_voice_design(text, language, instruct)` | `1.7B-VoiceDesign` | Synthesizes a persona from a text prompt. Each call is an **independent sample** — right for variation, wrong for continuity. | ~30 modules |
+| `create_voice_clone_prompt(ref_audio, ref_text)` | `1.7B-Base` | Compiles a 3–15 s reference clip into a **reusable identity handle**. Called once per character. | 01, 05, 08, 14 |
+| `generate_voice_clone(text, language, voice_clone_prompt=)` | `1.7B-Base` | Renders a line at a **pinned identity**. This is the consistency primitive. | 01, 03, 05, 08, 14 |
+| `generate_custom_voice(text, language, speaker, instruct)` | `*-CustomVoice` | Preset speaker with **orthogonal** instruct direction — two presets carried 32 distinct crowd characters in module 19. | 02, 05, 09, 10, 19 |
+
+### The REST surface
+
+Exposed by [`09_Colab_Webhook_API_MVP.ipynb`](./01_general_tts/09_Colab_Webhook_API_MVP.ipynb), which co-resides `0.6B-CustomVoice` and `1.7B-VoiceDesign` in a single T4's VRAM behind FastAPI:
+
+| Method | Route | Returns |
+|---|---|---|
+| `GET` | `/` | Health check |
+| `GET` | `/api/speakers` | Preset speaker list |
+| `POST` | `/api/tts/custom` | `StreamingResponse`, `audio/wav` |
+| `POST` | `/api/tts/design` | `StreamingResponse`, `audio/wav` |
+
+Both audio routes write to an in-memory `io.BytesIO` and stream it back — no temp files touch disk.
+
+### What talks to the network
+
+Worth being explicit, because it is the architectural difference from every hosted TTS product: **every runtime network call is a weights download or a content fetch.** HuggingFace Hub for the checkpoints, an Aliyun-hosted `clone.wav` for the demo reference clip, RSS feeds in module 06, and the `cloudflared` binary in module 09.
+
+There is no DashScope, OpenAI, ElevenLabs, or Anthropic call anywhere in this repository, and **no credential is ever read** — zero occurrences of `os.environ`, `os.getenv`, or `google.colab.userdata.get`. Inference is entirely local. Audio never leaves the machine.
+
+---
+
 ## 📂 Repository Structure
 
 ```
-chronovox/
+open-weight-ai-agent-game-voice-generator/
 ├── 01_general_tts/           # Notebooks 01–10 — core synthesis & delivery
 ├── 02_game_npc_voices/       # Notebooks 11–20 — game & NPC production modules
 ├── 03_character_archetypes/  # Notebooks 21–31 — lifetime voice modulation
@@ -227,7 +351,7 @@ Flashbacks, time-skips, generational sagas, a companion who ages across a campai
 
 ElevenLabs is the quality benchmark, and we treat it as such. The question was never which model sounds better in a single clip — it was whether a hosted, metered API can support this workload at all.
 
-| | Chronovox (Qwen3-TTS) | ElevenLabs |
+| | This system (Qwen3-TTS) | ElevenLabs |
 |---|---|---|
 | **Lifetime voice continuity** | Core capability | Not offered |
 | **Identity pinning** | Explicit, via compiled clone prompts | Implicit, per-voice |
@@ -245,10 +369,41 @@ Where ElevenLabs wins, it wins clearly: breadth of languages, zero operational b
 
 ---
 
+## 🤖 Planned: Agent Orchestration Layer
+
+> **Status: designed, not yet built.** No agent code ships in this repository today. This section is the specification for the next milestone, written down so the design is reviewable before it is implemented.
+
+Thirty-one modules established *what the model can do* and *which mode each job needs*. What they did not solve is orchestration: every module hardcodes its own cast, its own line inventory, and its own mode choice in a Python dict. Producing a new character means writing a new notebook.
+
+The agent layer closes that gap — it takes a production brief in natural language and drives the pipeline above end to end.
+
+**Input.** A brief: *"Give me a four-stage lifetime arc for a gruff engineer companion, 40 lines, engine-ready manifest."*
+
+| Step | What it does | Grounded in |
+|---|---|---|
+| **1. Plan** | Decompose the brief into a cast list, a `persona_core` per character, a stage/emotion matrix, and a line inventory. | The `personality_core` + `voice_modifier` construction already used across all 11 Series-3 modules. |
+| **2. Select mode** | Apply the repo's decision rule: more than ~2 consecutive lines for one character ⇒ **Design→Clone**; roster or grid variation ⇒ **per-call VoiceDesign**; ambient or preset-sufficient ⇒ **CustomVoice**. | [Architecture: Two Modes](#architecture-two-modes-chosen-deliberately) and the [Capability Evaluation](#-capability-evaluation) verdicts. |
+| **3. Render** | Issue **batched** `qwen_tts` calls rather than serial Python loops. | The SDK already accepts list-valued `text`, `language`, and `instruct` — demonstrated in [`reference/Qwen3_TTS_Colab.ipynb`](./reference/Qwen3_TTS_Colab.ipynb) §3–4 and used by no application module. This is the single largest available speedup. |
+| **4. QA** | Duration, leading/trailing silence, and clipping checks via `sf.info`; regenerate outliers automatically. | Currently a manual listen-through. |
+| **5. Emit** | WAVs plus a standardized manifest keyed so an engine resolves a state to an audio file with zero mapping logic. | Generalizes `dialogue_manifest.json` from [`16_Branching_Dialogue_Tree_MVP.ipynb`](./02_game_npc_voices/16_Branching_Dialogue_Tree_MVP.ipynb) — the repo's only structured export today. |
+
+### Prerequisite refactor
+
+Two things have to change first, and both are honest consequences of building exploratory notebooks rather than a library:
+
+1. **The notebook is currently the unit of execution.** There is no importable package — an agent has nothing to call. A shared `qwen_voice/` module needs to be extracted first.
+2. **Helper logic is duplicated across 32 files.** `to_wav`, `chunk_text`, and `clear_vram` exist in roughly five mutually incompatible dialects, and the return-shape normalization that `to_wav` handles is done ad hoc in 25 of the notebooks. That inconsistency is exactly what an orchestrator cannot tolerate.
+
+Consolidating those into one tested module is step zero, and it is what turns 31 demonstrations into a system with an API.
+
+---
+
 ## 🗺️ Roadmap
 
 Planned, not yet shipped:
 
+- **The agent orchestration layer above** — brief in, engine-ready voice pack out. The headline next milestone.
+- **Extract a shared `qwen_voice/` package** — one tested implementation of `to_wav`, `chunk_text`, and VRAM management, replacing 32 copy-pasted variants. Prerequisite for the agent.
 - **Batched generation.** The API accepts list-valued `text`, `language`, and `instruct`; every module currently renders serially in a Python loop. This is the largest available speedup.
 - **`x_vector_only_mode`** as an explicit speed/quality control for bulk packs.
 - **Design→Clone across the lifetime modules**, pinning each life stage the way the companion library pins its single voice.
